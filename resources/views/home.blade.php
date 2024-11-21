@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify Home</title>
+    <title>Home</title>
     @vite('resources/css/app.css')
 </head>
-<body>
-    <x-new-releases :newReleases="$newReleases"/>
+<body class="bg-BGHome overflow-x-hidden">
+    <x-header/>
+    <x-sidebar/>
+   
+    
+    {{-- <x-new-releases :newReleases="$newReleases"/> --}}
     <x-feat-playlist :featPlaylist="$featPlaylist"/>
-    <x-popular-song :popularSong="$popularSong"/>
-
+    {{-- <x-popular-song :popularSong="$popularSong"/> --}}
+    {{-- <script src="{{ asset('js/playlist-scroll.js') }}"></script> --}}
 </body>
 </html>

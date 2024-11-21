@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Route;
 // Route::get('/',[SpotifyController::class,'redirectToSpotify']);
 // Route::get('/callback',[SpotifyController::class,'handleSpotifyCallback']);
 
-Route::get('/', [ShowSongController::class,'homePage']);
+Route::get('/', [ShowSongController::class,'homePage'])->name('home');
+Route::get('/categories',function () {
+    return view('categories');
+});
 
 

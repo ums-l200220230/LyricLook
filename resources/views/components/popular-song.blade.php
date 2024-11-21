@@ -1,4 +1,4 @@
-<div>
+<div class="">
     <h1>Lagu Populer</h1>
     <div>
         @foreach($popularSong->tracks as $track)
