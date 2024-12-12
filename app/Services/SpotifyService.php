@@ -71,7 +71,7 @@ class SpotifyService
     {
         $token = $this->getAccessToken();
 
-        $response = $this->client->get('https://api.spotify.com/v1/browse/featured-playlists', [
+        $response = $this->client->get('https://api.spotify.com/v1/browse/featured-playlists?market=ID', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
             ],
