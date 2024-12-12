@@ -10,7 +10,7 @@
 <body class="bg-BGHome">
     <x-header/>
     <x-sidebar/>
-    <div class="container bg-hover rounded-xl mt-20 ml-60 p-3 w-auto">
+    <div class="container bg-[#313237] rounded-xl mt-20 ml-60 p-3 w-auto">
         <h2 class="text-2xl font-bold text-white mb-6">Categories</h2>
         <div class="grid grid-cols-4 gap-6">
             <div class="bg-gray-800 p-4 rounded-xl shadow-lg hover:bg-gray-700 transform transition">

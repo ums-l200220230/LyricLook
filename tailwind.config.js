@@ -12,9 +12,6 @@ export default {
     theme: {
         extend: {
             colors: {
-                costumBG : "#23262D",
-                BGHome : "#0B0E15",
-                hover : "#313237",
             },
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],

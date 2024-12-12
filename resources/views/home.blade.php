@@ -6,7 +6,7 @@
     <title>Home</title>
     @vite('resources/css/app.css')
 </head>
-<body class="bg-BGHome overflow-x-hidden">
+<body class="bg-[#0B0E15] overflow-x-hidden">
     <x-header/>
     <x-sidebar/>
    

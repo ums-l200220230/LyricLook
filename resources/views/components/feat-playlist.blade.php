@@ -1,4 +1,4 @@
-<div class="container mx-auto bg-hover rounded-xl mt-20 ml-60 w-auto">
+<div class="container mx-auto bg-[#313237] rounded-xl mt-20 ml-60 w-auto">
     <h2 class="px-2 text-2xl font-bold text-white">Playlist Unggulan</h2>
     {{-- <div class="flex items-center mb-2 mt-2">
         <button id="scroll-left" class="mx-2 text-white bg-gray-600 p-3 rounded-md hover:bg-gray-500">
