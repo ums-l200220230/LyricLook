@@ -21,6 +21,6 @@ class header extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.header');
+        return view('components.common.header');
     }
 }

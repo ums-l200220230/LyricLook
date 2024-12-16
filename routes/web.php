@@ -1,14 +1,15 @@
 <?php
 
-use App\Http\Controllers\ShowSongController;
+use App\Http\Controllers\SpotifyController;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('/',[SpotifyController::class,'redirectToSpotify']);
-// Route::get('/callback',[SpotifyController::class,'handleSpotifyCallback']);
 
-Route::get('/', [ShowSongController::class,'homePage'])->name('home');
-Route::get('/categories',function () {
-    return view('categories');
-});
+// Route::get('/login', [SpotifyController::class, 'redirectToSpotify'])->name('spotify.login');
+// Route::get('/callback', [SpotifyController::class, 'handleSpotifyCallback'])->name('spotify.callback');
+Route::get('/{artistId}', [SpotifyController::class, 'popularsong'])->name('home');
+
+
+
+
 
 

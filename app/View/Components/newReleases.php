@@ -6,17 +6,17 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class newReleases extends Component
+class newreleases extends Component
 {
     /**
      * Create a new component instance.
      */
 
-    public $newReleases;
+    public $newreleases;
     
-    public function __construct($newReleases)
+    public function __construct($newreleases)
     {
-        $this-> newReleases = $newReleases;
+        $this-> newreleases = $newreleases;
     }
 
     /**

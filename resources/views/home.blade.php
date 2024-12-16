@@ -7,13 +7,9 @@
     @vite('resources/css/app.css')
 </head>
 <body class="bg-[#0B0E15] overflow-x-hidden">
-    <x-header/>
-    <x-sidebar/>
-   
-    
-    {{-- <x-new-releases :newReleases="$newReleases"/> --}}
-    <x-feat-playlist :featPlaylist="$featPlaylist"/>
-    {{-- <x-popular-song :popularSong="$popularSong"/> --}}
-    {{-- <script src="{{ asset('js/playlist-scroll.js') }}"></script> --}}
+    {{-- <x-header/> --}}
+    {{-- <x-sidebar/>   --}}
+    {{-- <x-new-releases :newreleases="$newreleases"/> --}}
+    <x-popularsong :popularsong="$popularsong"/>
 </body>
 </html>

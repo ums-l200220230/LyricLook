@@ -1,54 +1,92 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Http\Request;
-use SpotifyWebAPI\SpotifyWebAPI;
-use SpotifyWebAPI\Session;
+
+use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+
 class SpotifyController extends Controller
 {
-    private $session;
-    private $api;
-    private $spotifyservices;
-    
+    private $client;
+    private $clientId;
+    private $clientSecret;
+
     public function __construct()
     {
-        $this->session = new Session(
-            config('services.spotify.client_id'),
-            config('services.spotify.client_secret'),
-            config('services.spotify.redirect')
-        );
-
-        $this->api = new SpotifyWebAPI();
-    }
-    public function redirectToSpotify()
-    {
-        $options = [
-            'scope' => [
-                'user-read-email',
-                'user-read-private',
-                'playlist-read-private',
-                'user-library-read',
-            ],
-        ];
-
-        return redirect($this->session->getAuthorizeUrl($options));
+        $this->client = new Client();
+        $this->clientId = env('SPOTIFY_IDCLIENT');
+        $this->clientSecret = env('SPOTIFY_SECRET');
     }
 
-    public function handleSpotifyCallback(Request $request)
+    private function getAccessToken()
     {
-       
-        if ($request->has('code')) {
-            $this->session->requestAccessToken($request->code);
-            $accessToken = $this->session->getAccessToken();
-
-            $this->api->setAccessToken($accessToken);
-
-            $user = $this->api->me();
-
-            return view('home', ['user' => $user]);
+        if (Cache::has('spotify_token')) {
+            return Cache::get('spotify_token');
         }
 
-        return redirect('/')->with('error', 'Gagal autentikasi dengan Spotify');
+        $response = $this->client->post('https://accounts.spotify.com/api/token', [
+            'headers' => [
+                'Authorization' => 'Basic ' . base64_encode($this->clientId . ':' . $this->clientSecret),
+            ],
+            'form_params' => [
+                'grant_type' => 'client_credentials',
+            ],
+        ]);
+
+        $body = json_decode($response->getBody()->getContents());
+        $token = $body->access_token;
+        $expiresIn = $body->expires_in;
+
+        Cache::put('spotify_token', $token, now()->addSeconds($expiresIn));
+
+        return $token;
     }
-    
+
+    public function getNewReleases()
+    {
+        $token = $this->getAccessToken();
+        $response = $this->client->get('https://api.spotify.com/v1/browse/new-releases', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+            ],
+        ]);
+
+        return json_decode($response->getBody()->getContents());
+    }
+
+    public function getPopularSongs($artistId)
+    {
+        $token = $this->getAccessToken();
+
+        $response = $this->client->get("https://api.spotify.com/v1/artists/{$artistId}/top-tracks?market=US", [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+            ],
+        ]);
+
+        return json_decode($response->getBody()->getContents());
+    }
+    public function homepage() 
+    {
+        $newreleases = $this->getNewReleases();
+        
+
+        // Debug data dari API
+        Log::info('New Releases Data:', (array) $newreleases);
+
+        $newreleases = $newreleases->albums->items ?? [];
+
+        // Debug data albums
+        Log::info('Albums Data:', (array) $newreleases);
+
+        return view('home', compact('newreleases'));
+    }
+    public function popularsong($artistId)
+    {
+        $popularsong = $this->getPopularSongs($artistId);
+        dd($popularsong);
+        return view('home', compact('popularsong'));
+    }
+
 }
