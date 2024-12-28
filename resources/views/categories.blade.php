@@ -7,12 +7,12 @@
     <title>Categories</title>
     @vite('resources/css/app.css')
 </head>
-<body class="bg-BGHome">
+<body class="bg-[#0B0E15]">
     <x-header/>
     <x-sidebar/>
-    <div class="container bg-[#313237] rounded-xl mt-20 ml-60 p-3 w-auto">
+    <div class="container bg-[#23262D] rounded-xl ml-64 p-3 w-auto mr-2">
         <h2 class="text-2xl font-bold text-white mb-6">Categories</h2>
-        <div class="grid grid-cols-4 gap-6">
+        <div class="grid grid-cols-2 gap-6 text-center">
             <div class="bg-gray-800 p-4 rounded-xl shadow-lg hover:bg-gray-700 transform transition">
                 <p class="text-white text-lg font-semibold">Pop</p>
             </div>
