@@ -84,7 +84,41 @@ class SpotifyController extends Controller
             return $playlists;
         }
     }
+    public function addToPlaylist(Request $request, $playlistId){
+        $accessToken = session('spotify_access_token');
+        $trackurl = $request->input('track_uri');
 
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $accessToken,
+        ])->post("https://api.spotify.com/v1/playlists/$playlistId/tracks", [
+            'uris' => [$trackurl]
+        ]);
+
+        if ($response->successful()) {
+            return redirect()->back()->with('success', 'Track successfully added to playlist.');
+        } else {
+            return redirect()->back()->with('error', 'Failed to add track to playlist.');
+        }
+    }
+    public function removeFromPlaylist(Request $request, $playlistId){
+        $accessToken = session('spotify_access_token');
+        $trackurl = $request->input('track_uri');
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $accessToken,
+            'Content-Type' => 'application/json',
+        ])->delete("https://api.spotify.com/v1/playlists/{$playlistId}/tracks", [
+            'tracks' => [
+                ['uri' => $trackurl]
+            ],
+        ]);
+
+        if ($response->successful()) {
+            return redirect()->back()->with('success', 'Track successfully removed from playlist.');
+        } else {
+            return redirect()->back()->with('error', 'Failed to remove track from playlist.');
+        }
+    }
     public function getSpotifyCategories($accessToken){
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $accessToken,
@@ -96,8 +130,7 @@ class SpotifyController extends Controller
     public function getSongbyCategory($categoryId){
         $accessToken = session('spotify_access_token');
     
-        // Ambil nama kategori berdasarkan ID (jika kamu ingin menggunakan nama kategori dalam pencarian)
-        $category = $this->getSpotifyCategories($accessToken); // Ambil data kategori
+        $category = $this->getSpotifyCategories($accessToken); 
         $categoryName = '';
     
         foreach ($category['categories']['items'] as $item) {
@@ -107,19 +140,18 @@ class SpotifyController extends Controller
             }
         }
     
-        // Cari lagu berdasarkan nama kategori (misalnya "rock", "pop", dll)
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $accessToken,
         ])->get('https://api.spotify.com/v1/search', [
-            'query' => $categoryName, // Gunakan nama kategori untuk pencarian
+            'query' => $categoryName,
             'type' => 'track',
-            'limit' => 10
+            'limit' => 12
         ]);
     
         $song = $response->json();
         $user = $this->getUserProfile($accessToken);
-    
-        return view('categoriessong', compact('song', 'user'));
+        $playlists = $this->getUserPlaylist($accessToken);
+        return view('categoriessong', compact('song', 'user','playlists'));
     }
     public function getUserTracks($playlistId){
         $accessToken = session('spotify_access_token');

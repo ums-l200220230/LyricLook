@@ -12,11 +12,11 @@
     <x-sidebar/>
 
     <div class="container mx-auto p-6 ml-64 mr-2 rounded-xl w-auto bg-[#23262D]">
-        <h2 class="text-white text-2xl mb-4">Tracks in Playlist</h2>
+        <h2 class="text-white text-2xl font-semibold mb-4">Tracks in Playlist</h2>
         @if (isset($tracks) && count($tracks) > 0)
             <ul class="grid grid-cols-3 gap-4">
                 @foreach ($tracks as $track)
-                    <li class="bg-[#313237] p-4 rounded-lg text-white flex items-center space-x-4">
+                    <li class="bg-[#2F343D] hover:bg-[#4F5968] p-4 rounded-lg text-white flex items-center space-x-4">
                         @if (isset($track['track']['album']['images'][0]['url']))
                             <img src="{{ $track['track']['album']['images'][0]['url'] }}" alt="Album Cover" class="w-16 h-16 rounded-lg object-cover">
                         @endif

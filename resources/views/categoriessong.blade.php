@@ -11,11 +11,11 @@
     <x-header :user="$user"/>
     <x-sidebar/>
     <div class="container mx-auto p-6 ml-64 rounded-xl bg-[#23262D] w-auto mr-2">
-        <h1 class="text-3xl font-semibold text-center mb-8 text-white">Lagu-lagu dalam Kategori</h1>
+        <h1 class="text-2xl font-semibold text-center mb-8 text-white">Songs in categories</h1>
     
         <div class="grid grid-cols-3 gap-6 mt-2">
             @foreach ($song['tracks']['items'] as $track)
-                <div class="bg-[#313237] rounded-lg p-4 flex items-center space-x-4">
+                <div class="bg-[#2F343D] hover:bg-[#4F5968] rounded-lg p-4 flex items-center space-x-4">
                     @if (isset($track['album']['images'][0]['url']))
                         <img src="{{ $track['album']['images'][0]['url'] }}" alt="{{ $track['name'] }}" class="w-16 h-16 rounded-lg object-cover">
                     @endif
