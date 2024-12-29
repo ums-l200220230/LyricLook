@@ -8,7 +8,7 @@
     @vite('resources/css/app.css')
 </head>
 <body class="bg-[#0B0E15]">
-    <x-header/>
+    <x-header :user="$user"/>
     <x-sidebar/>
     <div class="container bg-[#23262D] rounded-xl ml-64 p-3 w-auto mr-2">
         <h2 class="text-2xl font-bold text-white mb-6">Categories</h2>

@@ -4,14 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Request as FacadesRequest;
+
 
 class SpotifyController extends Controller
 {
     
-    public function login()
-    {
+    public function login(){
         $authorizeUrl = 'https://accounts.spotify.com/authorize?' . http_build_query([
             'response_type' => 'code',
             'client_id' => env('SPOTIFY_IDCLIENT'),
@@ -22,10 +20,14 @@ class SpotifyController extends Controller
 
         return redirect($authorizeUrl); 
     }
+    public function logout(Request $request){
+        $request->session()->forget('spotify_access_token');
+        
+        return redirect()->route('login');
+    }
 
     
-    public function callback(Request $request)
-    {
+    public function callback(Request $request){
         $code = $request->query('code');
         $state = $request->query('state');
 
@@ -68,17 +70,51 @@ class SpotifyController extends Controller
             'Authorization' => 'Bearer ' . $accessToken,
         ])->get('https://api.spotify.com/v1/me/playlists');
 
-        return $response->json()['items'];
-
+        if ($response->successful()) {
+            $playlists = $response->json()['items'];
+    
+            foreach ($playlists as $key => $playlist) {
+                if (isset($playlist['images'][0]['url'])) {
+                    $playlists[$key]['image_url'] = $playlist['images'][0]['url'];
+                } else {
+                    $playlists[$key]['image_url'] = null;
+                }
+            }
+    
+            return $playlists;
+        }
     }
 
+
+
+    
     public function home(Request $request){
         $accessToken = session('spotify_access_token');
 
         $user = $this->getUserProfile($accessToken);
-        $playlists = $this->getUserPlaylist($accessToken);
 
-        return view('home', compact('user','playlists'));
+        return view('home', compact('user'));
+    }
+
+    public function categories(Request $request){
+        $accessToken = session('spotify_access_token');
+
+        $user = $this->getUserProfile($accessToken);
+        return view('categories',compact('user'));
+    }
+
+    public function artist(Request $request){
+        $accessToken = session('spotify_access_token');
+
+        $user = $this->getUserProfile($accessToken);
+        return view('artist',compact('user'));
+    }
+
+    public function playlist(Request $request){
+        $accessToken = session('spotify_access_token');
+
+        $user = $this->getUserProfile($accessToken);
+        return view('playlist',compact('user'));
     }
 
     
