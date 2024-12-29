@@ -93,6 +93,34 @@ class SpotifyController extends Controller
         return $response->json();
     }
 
+    public function getSongbyCategory($categoryId){
+        $accessToken = session('spotify_access_token');
+    
+        // Ambil nama kategori berdasarkan ID (jika kamu ingin menggunakan nama kategori dalam pencarian)
+        $category = $this->getSpotifyCategories($accessToken); // Ambil data kategori
+        $categoryName = '';
+    
+        foreach ($category['categories']['items'] as $item) {
+            if ($item['id'] === $categoryId) {
+                $categoryName = $item['name'];
+                break;
+            }
+        }
+    
+        // Cari lagu berdasarkan nama kategori (misalnya "rock", "pop", dll)
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $accessToken,
+        ])->get('https://api.spotify.com/v1/search', [
+            'query' => $categoryName, // Gunakan nama kategori untuk pencarian
+            'type' => 'track',
+            'limit' => 10
+        ]);
+    
+        $song = $response->json();
+        $user = $this->getUserProfile($accessToken);
+    
+        return view('categoriessong', compact('song', 'user'));
+    }
     public function getUserTracks($playlistId){
         $accessToken = session('spotify_access_token');
 

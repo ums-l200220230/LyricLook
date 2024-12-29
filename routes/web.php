@@ -11,9 +11,11 @@ Route::get('/callback',[SpotifyController::class,'callback']);
 // page
 Route::get('/',[SpotifyController::class,'home'])->name('home');
 Route::get('/categories',[SpotifyController::class, 'categories'])->name('categories');
+Route::get('/categories/{id}',[SpotifyController::class, 'getSongbyCategory'])->name('song');
 Route::get('/artist',[SpotifyController::class, 'artist'])->name('artist');
 Route::get('/playlist',[SpotifyController::class, 'playlist'])->name('playlist');
 Route::get('/playlist/{id}',[SpotifyController::class,'getUserTracks'])->name('tracks');
+
 Route::get('/logout',[SpotifyController::class,'logout'])->name('logout');
 
 Route::get('/login',function(){
