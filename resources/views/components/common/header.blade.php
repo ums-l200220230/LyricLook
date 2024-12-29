@@ -3,7 +3,7 @@
 <header class="z-10 top-0 ml-60 flex items-center justify-between">
     <div class="px-6 py-4">
         <div class="flex">
-            <input class="rounded-l-full px-4 py-3 text-white outline-none bg-[#23262D] flex-grow" type="text" placeholder="Search for a song" id="search">
+            <input class="rounded-l-full px-4 py-3 text-white outline-none bg-[#23262D] flex-grow " type="text" placeholder="Search for a song" id="search">
             <button class="rounded-r-full bg-[#23262D] px-4 py-3"><img src="{{asset('icons/search.svg')}}" alt="SearchIcon"></button>
         </div>
     </div>

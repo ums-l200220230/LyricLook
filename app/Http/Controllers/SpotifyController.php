@@ -85,7 +85,25 @@ class SpotifyController extends Controller
         }
     }
 
+    public function getSpotifyCategories($accessToken){
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $accessToken,
+        ])->get("https://api.spotify.com/v1/browse/categories");
 
+        return $response->json();
+    }
+
+    public function getUserTracks($playlistId){
+        $accessToken = session('spotify_access_token');
+
+        $response =  Http::withHeaders([
+            'Authorization' => 'Bearer ' . $accessToken,
+        ])->get("https://api.spotify.com/v1/playlists/{$playlistId}/tracks");
+
+        $tracks =  $response->json()['items'];
+        $user = $this->getUserProfile($accessToken);
+        return view('playlisttracks',compact('tracks','user'));
+    }
 
     
     public function home(Request $request){
@@ -100,7 +118,8 @@ class SpotifyController extends Controller
         $accessToken = session('spotify_access_token');
 
         $user = $this->getUserProfile($accessToken);
-        return view('categories',compact('user'));
+        $categories = $this->getSpotifyCategories($accessToken);
+        return view('categories',compact('user','categories'));
     }
 
     public function artist(Request $request){
@@ -114,7 +133,9 @@ class SpotifyController extends Controller
         $accessToken = session('spotify_access_token');
 
         $user = $this->getUserProfile($accessToken);
-        return view('playlist',compact('user'));
+        $playlists = $this->getUserPlaylist($accessToken);
+
+        return view('playlist',compact('user','playlists'));
     }
 
     
