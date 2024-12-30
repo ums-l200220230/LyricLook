@@ -7,10 +7,9 @@
     <title>My playlist</title>
     @vite('resources/css/app.css')
 </head>
-<body class="bg-[#0B0E15] overflow-x-hidden">
+<body class="bg-[#0B0E15]">
     <x-header :user="$user"/>
     <x-sidebar/>
-
     <div class="container mx-auto p-6 ml-64 mr-2 rounded-xl w-auto bg-[#23262D]">
         <h2 class="text-white text-2xl font-semibold mb-4">Tracks in Playlist</h2>
         @if (isset($tracks) && count($tracks) > 0)
@@ -27,8 +26,6 @@
                     </li>
                 @endforeach
             </ul>
-        @else
-            <p class="text-gray-400">No tracks found in this playlist.</p>
         @endif
     </div>
     

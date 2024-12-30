@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Reviews;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-
+use Illuminate\Support\Facades\Session;
 
 class SpotifyController extends Controller
 {
@@ -84,41 +85,8 @@ class SpotifyController extends Controller
             return $playlists;
         }
     }
-    public function addToPlaylist(Request $request, $playlistId){
-        $accessToken = session('spotify_access_token');
-        $trackurl = $request->input('track_uri');
 
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $accessToken,
-        ])->post("https://api.spotify.com/v1/playlists/$playlistId/tracks", [
-            'uris' => [$trackurl]
-        ]);
-
-        if ($response->successful()) {
-            return redirect()->back()->with('success', 'Track successfully added to playlist.');
-        } else {
-            return redirect()->back()->with('error', 'Failed to add track to playlist.');
-        }
-    }
-    public function removeFromPlaylist(Request $request, $playlistId){
-        $accessToken = session('spotify_access_token');
-        $trackurl = $request->input('track_uri');
-
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $accessToken,
-            'Content-Type' => 'application/json',
-        ])->delete("https://api.spotify.com/v1/playlists/{$playlistId}/tracks", [
-            'tracks' => [
-                ['uri' => $trackurl]
-            ],
-        ]);
-
-        if ($response->successful()) {
-            return redirect()->back()->with('success', 'Track successfully removed from playlist.');
-        } else {
-            return redirect()->back()->with('error', 'Failed to remove track from playlist.');
-        }
-    }
+    
     public function getSpotifyCategories($accessToken){
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $accessToken,
@@ -145,7 +113,7 @@ class SpotifyController extends Controller
         ])->get('https://api.spotify.com/v1/search', [
             'query' => $categoryName,
             'type' => 'track',
-            'limit' => 12
+            'limit' => 30
         ]);
     
         $song = $response->json();
@@ -165,13 +133,12 @@ class SpotifyController extends Controller
         return view('playlisttracks',compact('tracks','user'));
     }
 
-    
     public function home(Request $request){
         $accessToken = session('spotify_access_token');
 
         $user = $this->getUserProfile($accessToken);
-
-        return view('home', compact('user'));
+        $playlists = $this->getUserPlaylist($accessToken);
+        return view('home', compact('user','playlists'));
     }
 
     public function categories(Request $request){
@@ -179,14 +146,8 @@ class SpotifyController extends Controller
 
         $user = $this->getUserProfile($accessToken);
         $categories = $this->getSpotifyCategories($accessToken);
+
         return view('categories',compact('user','categories'));
-    }
-
-    public function artist(Request $request){
-        $accessToken = session('spotify_access_token');
-
-        $user = $this->getUserProfile($accessToken);
-        return view('artist',compact('user'));
     }
 
     public function playlist(Request $request){
@@ -197,6 +158,5 @@ class SpotifyController extends Controller
 
         return view('playlist',compact('user','playlists'));
     }
-
     
 }

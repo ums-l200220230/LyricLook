@@ -23,6 +23,7 @@
                         <h5 class="text-white font-semibold">{{ $track['name'] }}</h5>
                         <p class="text-gray-400 text-sm">{{ $track['artists'][0]['name'] }}</p>
                     </div>
+
                 </div>
             @endforeach
         </div>

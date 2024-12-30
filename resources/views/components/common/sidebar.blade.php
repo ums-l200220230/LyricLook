@@ -9,10 +9,6 @@
             <img src="{{asset('icons/categories.svg')}}" alt="CategoriesIcon">
             <div class="text-lg font-semibold">Categories</div> 
         </a>
-        <a href="{{url('/artist')}}" class="hover:bg-[#313237] rounded-2xl p-3 mt-2 mx-2 flex space-x-3">
-            <img src="{{asset('icons/artist.svg')}}" alt="ArtistsIcon">
-            <div class="text-lg font-semibold">Artists</div> 
-        </a>
         <a href="{{url('/playlist')}}" class="hover:bg-[#313237] rounded-2xl p-3 mt-2 mx-2 flex space-x-3">
             <img src="{{ asset('icons/list.svg') }}" alt="PlaylistIcon">
             <div class="text-lg font-semibold">Playlists</div>
