@@ -14,10 +14,9 @@
             <div class="text-lg font-semibold">Playlists</div>
         </a>
         
-        <a href="{{route('logout')}}" class="hover:bg-[#313237] rounded-2xl p-3 mx-2 flex space-x-3 mt-56 mb-5">
+        <a href="{{route('logout')}}" class="hover:bg-[#313237] rounded-2xl p-3 mx-2 flex space-x-3 mt-60 mb-5">
             <img src="{{asset('icons/log-out.svg')}}" alt="LogoutIcon">
             <div class="text-lg font-semibold">Logout</div>
         </a>
-        
     </div>
 </aside>

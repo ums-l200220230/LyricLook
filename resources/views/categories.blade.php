@@ -11,6 +11,6 @@
     <x-header :user="$user"/>
     <x-sidebar/>
     <x-categories :categories="$categories"/>
-
+    
 </body>
 </html>

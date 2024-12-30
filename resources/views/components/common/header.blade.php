@@ -12,8 +12,5 @@
             <img src="{{$user['images'][0]['url'] ?? ''}}" alt="UserImg" class="w-10 rounded-full">
             <div>{{$user['display_name']}}</div>
         </div>
-        <div class="rounded-full bg-[#23262D] p-2">
-            <img src="{{asset('icons/settings.svg')}}" alt="SettingIcon">
-        </div>
     </div>
 </header>

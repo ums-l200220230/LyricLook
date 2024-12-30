@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Reviews;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Session;
 
 class SpotifyController extends Controller
 {
@@ -15,7 +14,7 @@ class SpotifyController extends Controller
             'response_type' => 'code',
             'client_id' => env('SPOTIFY_IDCLIENT'),
             'redirect_uri' => env('SPOTIFY_URL'),
-            'scope' => 'user-top-read user-library-read playlist-read-private',
+            'scope' => 'user-read-private user-read-email playlist-read-private playlist-modify-public playlist-modify-private',
             'state' => csrf_token(),  
         ]);
 
@@ -47,13 +46,27 @@ class SpotifyController extends Controller
         if ($response->successful()) {
             $accessToken = $response->json()['access_token'];
 
+            // Simpan access token ke session
             session(['spotify_access_token' => $accessToken]);
 
-            return redirect()->route('home'); 
+            // Ambil profil user Spotify
+            $userResponse = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $accessToken,
+            ])->get('https://api.spotify.com/v1/me');
+
+            if ($userResponse->successful()) {
+                $userId = $userResponse->json()['id']; // Spotify user ID
+                session(['spotify_user_id' => $userId]); // Simpan ke session
+            } else {
+                return response()->json(['error' => 'Failed to fetch user profile'], 500);
+            }
+
+            return redirect()->route('home')->with('success', 'Berhasil login dengan Spotify!');
         } else {
             return response()->json(['error' => 'Failed to get access token'], 500);
         }
     }
+
     
     public function getUserProfile($accessToken){
 
@@ -86,7 +99,72 @@ class SpotifyController extends Controller
         }
     }
 
-    
+    public function create(Request $request){
+        $request->validate([
+            'name' => 'required|string|max:100',
+            'description' => 'nullable|string|max:300',
+        ]);
+
+        $accessToken = session('spotify_access_token');
+        $userId = session('spotify_user_id');
+
+        if (!$accessToken || !$userId) {
+            return redirect()->route('home')->with('error', 'Spotify user tidak ditemukan.');
+        }
+
+        $data = [
+            'name' => $request->name,
+            'description' => $request->description ?? '',
+            'public' => true,
+        ];
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $accessToken,
+            'Content-Type' => 'application/json',
+        ])->post("https://api.spotify.com/v1/users/{$userId}/playlists", $data);
+        
+        if ($response->successful()) {
+            return redirect()->route('playlist')->with('success', 'Playlist berhasil dibuat!');
+        } else {
+            return redirect()->route('home')->with('error', 'Gagal membuat playlist. Coba lagi.');
+        }
+    }
+    public function removeSongFromPlaylist($playlistId, $trackId)
+    {
+        $accessToken = session('spotify_access_token');
+        
+        if (!$accessToken) {
+            return redirect()->route('home')->with('error', 'Akses Spotify tidak ditemukan.');
+        }
+
+        // Track URI
+        $trackUri = 'spotify:track:' . $trackId;
+
+        // Mengirim permintaan DELETE ke Spotify API untuk menghapus lagu dari playlist
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $accessToken,
+        ])->delete("https://api.spotify.com/v1/playlists/{$playlistId}/tracks", [
+            'tracks' => [
+                [
+                    'uri' => $trackUri
+                ]
+            ]
+        ]);
+
+        // Mengecek apakah permintaan berhasil
+        if ($response->successful()) {
+            return redirect()->route('playlist')->with('success', 'Lagu berhasil dihapus dari playlist.');
+        } else {
+            return redirect()->route('playlist')->with('error', 'Gagal menghapus lagu dari playlist.');
+        }
+    }
+
+
+
+
+
+
+
     public function getSpotifyCategories($accessToken){
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $accessToken,
@@ -121,18 +199,60 @@ class SpotifyController extends Controller
         $playlists = $this->getUserPlaylist($accessToken);
         return view('categoriessong', compact('song', 'user','playlists'));
     }
-    public function getUserTracks($playlistId){
+
+    public function getUserTracks($id){
         $accessToken = session('spotify_access_token');
 
-        $response =  Http::withHeaders([
-            'Authorization' => 'Bearer ' . $accessToken,
-        ])->get("https://api.spotify.com/v1/playlists/{$playlistId}/tracks");
+        if (!$accessToken) {
+            return redirect()->route('home')->with('error', 'Akses Spotify tidak ditemukan.');
+        }
 
-        $tracks =  $response->json()['items'];
+        // Mendapatkan data playlist berdasarkan ID
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $accessToken,
+        ])->get("https://api.spotify.com/v1/playlists/{$id}");
+
+        // Cek apakah respons berhasil
+        if ($response->successful()) {
+            $playlist = $response->json();  // Ambil data playlist
+        } else {
+            return redirect()->route('home')->with('error', 'Gagal mendapatkan playlist.');
+        }
+
+        // Mendapatkan tracks dari playlist
+        $tracksResponse = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $accessToken,
+        ])->get("https://api.spotify.com/v1/playlists/{$id}/tracks");
+
+        $tracks = $tracksResponse->json()['items'] ?? [];
+
+        // Kirim data playlist dan tracks ke view
+
         $user = $this->getUserProfile($accessToken);
-        return view('playlisttracks',compact('tracks','user'));
+        return view('playlisttracks', compact('playlist', 'tracks', 'user'));
     }
 
+    public function renamePlaylist(Request $request, $id){
+        $accessToken = session('spotify_access_token');
+
+        if (!$accessToken) {
+            return redirect()->route('home')->with('error', 'Akses Spotify tidak ditemukan.');
+        }
+
+        $newName = $request->input('name');
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $accessToken,
+        ])->put("https://api.spotify.com/v1/playlists/{$id}", [
+            'name' => $newName,
+        ]);
+
+        if ($response->successful()) {
+            return redirect()->route('playlist')->with('success', 'Nama playlist berhasil diubah.');
+        } else {
+            return redirect()->route('playlist')->with('error', 'Gagal mengubah nama playlist.');
+        }
+    }
     public function home(Request $request){
         $accessToken = session('spotify_access_token');
 

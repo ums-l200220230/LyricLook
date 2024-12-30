@@ -23,11 +23,21 @@
                             <div class="font-semibold">{{ $track['track']['name'] }}</div>
                             <div class="text-sm text-gray-400">{{ $track['track']['artists'][0]['name'] }}</div>
                         </div>
+    
+                        <!-- Form to remove song from playlist -->
+                        <form action="{{ route('playlist.remove_song', ['playlist_id' => $playlist['id'], 'track_id' => $track['track']['id']]) }}" method="POST" class="ml-4">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-500 hover:text-red-700">Hapus</button>
+                        </form>
                     </li>
                 @endforeach
             </ul>
+        @else
+            <p class="text-gray-400">Tidak ada lagu di playlist.</p>
         @endif
     </div>
+    
     
     
 </body>
